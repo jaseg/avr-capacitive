@@ -51,10 +51,16 @@ int main(void)
 	for(;;){
 		//Sample acquiration and interrupt request transmission are divided since both need some time, the latter depending on the device and host's config, the former solely depending on the ADC.
 		if(ADCSRA & ADIF){
-			ADCSRA |= ADIF | ADSC; //Clear ADIF and start a new conversion (which takes 1664 cycles)
 			intout[1] = ADCH;
 			intout[2] = ADCL; //Yeah, we do this big-endian
+			ADMUX = 0x4F; //Select GND to discharge the s&r cap
+			PORTC |= 0x01; //Enable internal pullup on PC0 (ADC0) to charge the sensor plate
+			_delay_us(250); //Not sure if that is the right delay. Have yet to figure that out (perhaps it is not even possible)
+			PORTC &= 0xFE; //Disable pullup on sensor plate input
+			ADMUX = 0x4F; //Select the sensor input (ADC0/PC0) for conversion
+			ADCSRA |= ADIF | ADSC; //Clear ADIF and start a new conversion (which takes 1664 cycles)
 			//The first sample is discarded (I read this is recommended...)
+			//Has the nice bonus that without further initialization the sensor is fully operating from the second cycle (if we would want the first cycle to produce meaningful results, the code above would have to be replicated in front of the loop).
 			if(state & ADC_STARTUP)
 				state &= ~ADC_STARTUP;
 			else
