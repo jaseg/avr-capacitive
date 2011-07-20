@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 		}
 		//printf("Received interrupt data: %x\n", data[0]);
 		if(data[0] == VALUE_ACQUIRED){
-			int value = data[1]<<8|data[2];
+			int value = data[1]<<8|data[2]; //The sample is transmitted big-endian
 			printf("%d\n", value);
 		}
 	}

@@ -22,13 +22,14 @@
 #include "../usbdefines.h" //TODO bad style.
 #include "usbdrv.h"
 
-static uint8_t sample[2]; //Interrupt data
-
-
+//Main loop state defines
+#define CONVERSION_COMPLETE 0x80
+#define ADC_STARTUP 0x40 //Used to discard the first sample
 
 usbMsgLen_t usbFunctionSetup(uchar data[8])
 {
-	return USB_NO_MSG; //Is this correct? FIXME
+	//We can safely ignore all requests hitting this callback. The USB stack has already handled the actually important stuff.
+	return USB_NO_MSG;
 }
 
 int main(void)
@@ -41,16 +42,26 @@ int main(void)
 	//USB Initialization
 	usbInit();
 	sei();
-	ADSC |= ADSC;
+	//ADC startup
+	ADCSRA |= ADSC;
+	//Main loop vars
+	static uint8_t intout[3] = {VALUE_ACQUIRED, 0, 0}; //Interrupt data, NOTE: there are two locations below where this is being written, so beware when extending the program.
+	uint8_t state = ADC_STARTUP;
 	//Infinitely eternal main loop.
 	for(;;){
-		if(ADSRA & ADIF){
-			ADSRA |= ADIF | ADSC; //Clear ADIF and start a new conversion (which takes 1664 cycles)
-
+		//Sample acquiration and interrupt request transmission are divided since both need some time, the latter depending on the device and host's config, the former solely depending on the ADC.
+		if(ADCSRA & ADIF){
+			ADCSRA |= ADIF | ADSC; //Clear ADIF and start a new conversion (which takes 1664 cycles)
+			intout[1] = ADCH;
+			intout[2] = ADCL; //Yeah, we do this big-endian
+			//The first sample is discarded (I read this is recommended...)
+			if(state & ADC_STARTUP)
+				state &= ~ADC_STARTUP;
+			else
+				state |= CONVERSION_COMPLETE; //Signal to send the sample
 		}
-		if(usbInterruptIsReady()){
-			intout[0] = VALUE_ACQUIRED;
-			usbSetInterrupt(intout, 2);
+		if(usbInterruptIsReady() && (state & CONVERSION_COMPLETE)){ //Fresh data for the host!
+			usbSetInterrupt(intout, 3);
 		}
 		usbPoll();
 		//_delay_ms(1);

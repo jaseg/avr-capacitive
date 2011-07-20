@@ -1,0 +1,1 @@
+This is a test program for a capacitive softbutton implementation using nothing but one of the AVR's analog input pins. The program has an USB interface (using the VUSB software USB stack by obdev.at) to send the data to a computer. This program is free software, released under GPLv3 (to be found in LICENSE).
