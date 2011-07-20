@@ -1,5 +1,5 @@
-# 	Penta host implementation
-#	Copyright (C) 2011 by Sebastian Götte <s@jaseg.de>
+# 	AVR capacitive softbutton test host implementation
+# 	Copyright (C) 2011 by Sebastian Götte <s@jaseg.de>
 #
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SRC = opendevice.c main.c
-TARGET = penta
+TARGET = softbutton-test
 CFLAGS = -lusb -Wall -std=gnu99
 
 all: clean $(TARGET)

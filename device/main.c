@@ -1,4 +1,4 @@
-/* 	Penta controller firmware v0.0.0.0.0.0.1\alpha0-1
+/* 	AVR capacitive softbutton test firmware
 	Copyright (C) 2011 by Sebastian Götte <s@jaseg.de>
 
 	This program is free software: you can redistribute it and/or modify

@@ -1,4 +1,4 @@
-/* 	AVR capacitive softbutton test host implementation
+/* 	AVR capacitive softbutton test
 	Copyright (C) 2011 by Sebastian Götte <s@jaseg.de>
 
 	This program is free software: you can redistribute it and/or modify
